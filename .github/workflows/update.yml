@@ -3,8 +3,8 @@ name: Build RGB Control (Windows .exe)
 on:
   push:
     paths:
-      - "RGB-Control/**"
-      - ".github/workflows/rgbcontrol-build.yml"
+      - "RGB-Control.zip"
+      - ".github/workflows/update.yml"
   workflow_dispatch:
 
 defaults:
@@ -19,6 +19,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Unzip RGB-Control.zip
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: |
+          if (Test-Path RGB-Control) { Remove-Item -Recurse -Force RGB-Control }
+          Expand-Archive -Path RGB-Control.zip -DestinationPath . -Force
+          if (-not (Test-Path RGB-Control\requirements.txt)) { throw "RGB-Control\requirements.txt fehlt nach dem Entpacken" }
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
